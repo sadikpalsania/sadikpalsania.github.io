@@ -1,0 +1,12 @@
+name: "US Cycle Data Analysis"
+navbar:
+  title: "US Cycle Data Analysis 2021"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate

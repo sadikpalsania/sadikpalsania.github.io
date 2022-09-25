@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="sadikpalsania" />
+
+<meta name="date" content="2022-09-25" />
+
+<title>US Cyclist Data 2021 Analysis</title>
+
+<script src="site_libs/header-attrs-2.16/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">US Cycle Data Analysis 2021</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">US Cyclist Data 2021 Analysis</h1>
+<h4 class="author">sadikpalsania</h4>
+<h4 class="date">2022-09-25</h4>
+
+</div>
+
+
+<p>
+<h4>
+Scenario
+</h4>
+<p>You are a junior data analyst working in the marketing analyst team
+at Cyclistic, a bike-share company in Chicago. The director of marketing
+believes the company’s future success depends on maximizing the number
+of annual memberships. Therefore, your team wants to understand how
+casual riders and annual members use Cyclistic bikes dierently. From
+these insights, your team will design a new marketing strategy to
+convert casual riders into annual members. But first, Cyclistic
+executives must approve your recommendations, so they must be backed up
+with compelling data insights and professional data visualizations.</p>
+Characters and teams Cyclistic: A bike-share program that features more
+than 5,800 bicycles and 600 docking stations. Cyclistic sets itself
+apart by also oering reclining bikes, hand tricycles, and cargo bikes,
+making bike-share more inclusive to people with disabilities and riders
+who can’t use a standard two-wheeled bike. The majority of riders opt
+for traditional bikes; about 8% of riders use the assistive options.
+Cyclistic users are more likely to ride for leisure, but about 30% use
+them to commute to work each day. Lily Moreno: The director of marketing
+and your manager. Moreno is responsible for the development of campaigns
+and initiatives to promote the bike-share program. These may include
+email, social media, and other channels. Cyclistic marketing analytics
+team: A team of data analysts who are responsible for collecting,
+analyzing, and reporting data that helps guide Cyclistic marketing
+strategy. You joined this team six months ago and have been busy
+learning about Cyclistic’s mission and business goals — as well as how
+you, as a junior data analyst, can help Cyclistic achieve them.
+Cyclistic executive team: The notoriously detail-oriented executive team
+will decide whether to approve the recommended marketing program.
+</p>
+<pre class="r"><code>#loading libraries
+library(plyr)
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
+## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+## ✔ tidyr   1.2.1      ✔ stringr 1.4.1 
+## ✔ readr   2.1.2      ✔ forcats 0.5.2 
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::arrange()   masks plyr::arrange()
+## ✖ purrr::compact()   masks plyr::compact()
+## ✖ dplyr::count()     masks plyr::count()
+## ✖ dplyr::failwith()  masks plyr::failwith()
+## ✖ dplyr::filter()    masks stats::filter()
+## ✖ dplyr::id()        masks plyr::id()
+## ✖ dplyr::lag()       masks stats::lag()
+## ✖ dplyr::mutate()    masks plyr::mutate()
+## ✖ dplyr::rename()    masks plyr::rename()
+## ✖ dplyr::summarise() masks plyr::summarise()
+## ✖ dplyr::summarize() masks plyr::summarize()</code></pre>
+<pre class="r"><code>library(lubridate)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;
+## 
+## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
+<pre class="r"><code>library(DescTools)
+library(scales)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;scales&#39;
+## 
+## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     discard
+## 
+## The following object is masked from &#39;package:readr&#39;:
+## 
+##     col_factor</code></pre>
+<pre class="r"><code>#loading data set
+csv_files &lt;- list.files(path = &quot;C:/Users/sadik/Downloads/CaseStudyPython&quot;, recursive = TRUE, full.names=TRUE)
+
+#merging data set
+tripdata_merged &lt;- do.call(rbind, lapply(csv_files, read.csv))
+
+#view of data
+head(tripdata_merged)</code></pre>
+<pre><code>##            ride_id rideable_type          started_at            ended_at
+## 1 E19E6F1B8D4C42ED electric_bike 2021-01-23 16:14:19 2021-01-23 16:24:44
+## 2 DC88F20C2C55F27F electric_bike 2021-01-27 18:43:08 2021-01-27 18:47:12
+## 3 EC45C94683FE3F27 electric_bike 2021-01-21 22:35:54 2021-01-21 22:37:14
+## 4 4FA453A75AE377DB electric_bike 2021-01-07 13:31:13 2021-01-07 13:42:55
+## 5 BE5E8EB4E7263A0B electric_bike 2021-01-23 02:24:02 2021-01-23 02:24:45
+## 6 5D8969F88C773979 electric_bike 2021-01-09 14:24:07 2021-01-09 15:17:54
+##           start_station_name start_station_id end_station_name end_station_id
+## 1 California Ave &amp; Cortez St            17660                                
+## 2 California Ave &amp; Cortez St            17660                                
+## 3 California Ave &amp; Cortez St            17660                                
+## 4 California Ave &amp; Cortez St            17660                                
+## 5 California Ave &amp; Cortez St            17660                                
+## 6 California Ave &amp; Cortez St            17660                                
+##   start_lat start_lng end_lat end_lng member_casual
+## 1  41.90034 -87.69674   41.89  -87.72        member
+## 2  41.90033 -87.69671   41.90  -87.69        member
+## 3  41.90031 -87.69664   41.90  -87.70        member
+## 4  41.90040 -87.69666   41.92  -87.69        member
+## 5  41.90033 -87.69670   41.90  -87.70        casual
+## 6  41.90041 -87.69676   41.94  -87.71        casual</code></pre>
+<pre class="r"><code>#--------------------Preparing and Processing-------------------------
+
+#checking Null values and drop if there
+colSums(is.na(tripdata_merged))</code></pre>
+<pre><code>##            ride_id      rideable_type         started_at           ended_at 
+##                  0                  0                  0                  0 
+## start_station_name   start_station_id   end_station_name     end_station_id 
+##                  0                  0                  0                  0 
+##          start_lat          start_lng            end_lat            end_lng 
+##                  0                  0               4771               4771 
+##      member_casual 
+##                  0</code></pre>
+<pre class="r"><code>#No Null values find in my dataset
+tripdata_cleaned &lt;- tripdata_merged[complete.cases(tripdata_merged), ]
+
+# removing data where ending time is greater than starting time.
+tripdata_cleaned &lt;- tripdata_cleaned %&gt;% 
+  filter(tripdata_cleaned$started_at &lt; tripdata_cleaned$ended_at)
+
+#Changing datatype of datetime
+tripdata_cleaned$started_at &lt;- as.POSIXct(tripdata_cleaned$started_at, &quot;%Y-%m-%d %H:%M:%S&quot;)</code></pre>
+<pre><code>## Warning in strptime(xx, f, tz = tz): unknown timezone &#39;%Y-%m-%d %H:%M:%S&#39;</code></pre>
+<pre><code>## Warning in as.POSIXct.POSIXlt(x): unknown timezone &#39;%Y-%m-%d %H:%M:%S&#39;</code></pre>
+<pre><code>## Warning in strptime(x, f, tz = tz): unknown timezone &#39;%Y-%m-%d %H:%M:%S&#39;</code></pre>
+<pre><code>## Warning in as.POSIXct.POSIXlt(as.POSIXlt(x, tz, ...), tz, ...): unknown timezone
+## &#39;%Y-%m-%d %H:%M:%S&#39;</code></pre>
+<pre class="r"><code>tripdata_cleaned$ended_at &lt;- as.POSIXct(tripdata_cleaned$ended_at, &quot;%Y-%m-%d %H:%M:%S&quot;)</code></pre>
+<pre><code>## Warning in strptime(xx, f, tz = tz): unknown timezone &#39;%Y-%m-%d %H:%M:%S&#39;</code></pre>
+<pre><code>## Warning in as.POSIXct.POSIXlt(x): unknown timezone &#39;%Y-%m-%d %H:%M:%S&#39;</code></pre>
+<pre><code>## Warning in strptime(x, f, tz = tz): unknown timezone &#39;%Y-%m-%d %H:%M:%S&#39;</code></pre>
+<pre><code>## Warning in as.POSIXct.POSIXlt(as.POSIXlt(x, tz, ...), tz, ...): unknown timezone
+## &#39;%Y-%m-%d %H:%M:%S&#39;</code></pre>
+<pre class="r"><code>#Creating a column for month and year separately for calculation
+tripdata_cleaned &lt;- tripdata_cleaned %&gt;%
+  mutate(year_month = paste(strftime(tripdata_cleaned$started_at, &quot;%Y&quot;),
+                            &quot;-&quot;,
+                            strftime(tripdata_cleaned$started_at, &quot;%m&quot;),
+                            paste(&quot;(&quot;,strftime(tripdata_cleaned$started_at, &quot;%b&quot;), &quot;)&quot;, sep=&quot;&quot;)))
+unique(tripdata_cleaned$year_month)</code></pre>
+<pre><code>##  [1] &quot;2021 - 01 (Jan)&quot; &quot;2020 - 12 (Dec)&quot; &quot;2021 - 02 (Feb)&quot; &quot;2021 - 03 (Mar)&quot;
+##  [5] &quot;2021 - 04 (Apr)&quot; &quot;2021 - 05 (May)&quot; &quot;2021 - 06 (Jun)&quot; &quot;2021 - 07 (Jul)&quot;
+##  [9] &quot;2021 - 08 (Aug)&quot; &quot;2021 - 09 (Sep)&quot; &quot;2021 - 10 (Oct)&quot; &quot;2021 - 11 (Nov)&quot;
+## [13] &quot;2021 - 12 (Dec)&quot;</code></pre>
+<pre class="r"><code>#Creating column weekday for calculation
+tripdata_cleaned &lt;- tripdata_cleaned %&gt;%
+  mutate(weekday = paste(strftime(tripdata_cleaned$started_at, &quot;%u&quot;), 
+                         &quot;-&quot;, 
+                         strftime(tripdata_cleaned$started_at, &quot;%a&quot;)))
+unique(tripdata_cleaned$weekday)</code></pre>
+<pre><code>## [1] &quot;6 - Sat&quot; &quot;3 - Wed&quot; &quot;4 - Thu&quot; &quot;5 - Fri&quot; &quot;1 - Mon&quot; &quot;7 - Sun&quot; &quot;2 - Tue&quot;</code></pre>
+<pre class="r"><code>#Creating column for starting hour for calculation
+tripdata_cleaned &lt;- tripdata_cleaned %&gt;%
+  mutate(start_hour = strftime(tripdata_cleaned$ended_at, &quot;%H&quot;))
+unique(tripdata_cleaned$start_hour)</code></pre>
+<pre><code>##  [1] &quot;11&quot; &quot;13&quot; &quot;17&quot; &quot;08&quot; &quot;21&quot; &quot;10&quot; &quot;00&quot; &quot;05&quot; &quot;14&quot; &quot;07&quot; &quot;02&quot; &quot;04&quot; &quot;03&quot; &quot;06&quot; &quot;20&quot;
+## [16] &quot;16&quot; &quot;19&quot; &quot;12&quot; &quot;15&quot; &quot;09&quot; &quot;18&quot; &quot;01&quot; &quot;23&quot; &quot;22&quot;</code></pre>
+<pre class="r"><code># calculate and creating column ride length
+tripdata_cleaned$ride_length &lt;- tripdata_cleaned$ended_at - tripdata_cleaned$started_at
+
+# calculate mean of ride_length
+tripdata_cleaned %&gt;% 
+  summarize(mean(ride_length))</code></pre>
+<pre><code>##   mean(ride_length)
+## 1     1259.041 secs</code></pre>
+<pre class="r"><code># calculate max ride_length
+tripdata_cleaned %&gt;% 
+  summarize(max(ride_length))</code></pre>
+<pre><code>##   max(ride_length)
+## 1     3356649 secs</code></pre>
+<pre class="r"><code># calculate min ride_length
+tripdata_cleaned %&gt;% 
+  summarize(min(ride_length))</code></pre>
+<pre><code>##   min(ride_length)
+## 1           1 secs</code></pre>
+<pre class="r"><code># calculate mode of day_of_week
+Mode(tripdata_cleaned$weekday)</code></pre>
+<pre><code>## [1] &quot;6 - Sat&quot;
+## attr(,&quot;freq&quot;)
+## [1] 1000358</code></pre>
+<pre class="r"><code># calculate average ride_length for members and casual riders
+tripdata_cleaned %&gt;% 
+  group_by(member_casual) %&gt;% 
+  summarise(summary=mean(ride_length))</code></pre>
+<pre><code>## # A tibble: 2 × 2
+##   member_casual summary       
+##   &lt;chr&gt;         &lt;drtn&gt;        
+## 1 casual        1814.4844 secs
+## 2 member         801.3467 secs</code></pre>
+<pre class="r"><code>#calculate average ride_length by days of week
+tripdata_cleaned %&gt;% 
+  group_by(weekday) %&gt;% 
+  summarise(summary_day=mean(ride_length))</code></pre>
+<pre><code>## # A tibble: 7 × 2
+##   weekday summary_day  
+##   &lt;chr&gt;   &lt;drtn&gt;       
+## 1 1 - Mon 1187.447 secs
+## 2 2 - Tue 1070.923 secs
+## 3 3 - Wed 1054.328 secs
+## 4 4 - Thu 1075.458 secs
+## 5 5 - Fri 1211.926 secs
+## 6 6 - Sat 1512.685 secs
+## 7 7 - Sun 1591.839 secs</code></pre>
+<pre class="r"><code>#calculate No. of rides by user per day of week
+tripdata_cleaned %&gt;% 
+  group_by(ride_id, weekday) %&gt;% 
+  summarise(no_of_ride=n())</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;ride_id&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<pre><code>## # A tibble: 5,589,640 × 3
+## # Groups:   ride_id [5,589,640]
+##    ride_id          weekday no_of_ride
+##    &lt;chr&gt;            &lt;chr&gt;        &lt;int&gt;
+##  1 000002EBE159AE82 2 - Tue          1
+##  2 0000080D43BAA9E4 7 - Sun          1
+##  3 00000B4F1F71F9C2 3 - Wed          1
+##  4 00000CAE95438C9D 2 - Tue          1
+##  5 00000EBBC119168C 7 - Sun          1
+##  6 000019B7F053D461 5 - Fri          1
+##  7 00001A81D056B01B 3 - Wed          1
+##  8 00001B4F79D102B5 3 - Wed          1
+##  9 00001BEE76AB24E0 2 - Tue          1
+## 10 00001DCF2BC423F4 7 - Sun          1
+## # … with 5,589,630 more rows</code></pre>
+<pre class="r"><code>#-----------------------------------------------Analyzing and Visualizing-----------------------
+
+fig &lt;- function(width, heigth){options(repr.plot.width = width, repr.plot.height = heigth)}
+
+#Generalize form of Casual VS Member riders
+tripdata_cleaned %&gt;% 
+  group_by(member_casual) %&gt;% 
+  summarise(count = length(ride_id),
+            &#39;%&#39; = (length(ride_id) / nrow(tripdata_cleaned)) * 100)</code></pre>
+<pre><code>## # A tibble: 2 × 3
+##   member_casual   count   `%`
+##   &lt;chr&gt;           &lt;int&gt; &lt;dbl&gt;
+## 1 casual        2525174  45.2
+## 2 member        3064466  54.8</code></pre>
+<pre class="r"><code>#Graph 1 General distribution
+fig(16,8)
+ggplot(tripdata_cleaned, aes(member_casual, fill=member_casual)) +
+  geom_bar() +
+  labs(x=&quot;Casuals x Members&quot;, title=&quot;1 Casuals VS Members&quot;, subtitle = &quot;Generalized form&quot;)+
+  scale_y_continuous(labels = comma)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>#Data distribution in the months 
+tripdata_cleaned %&gt;% 
+  group_by(year_month) %&gt;% 
+  summarise(count=length(ride_id),
+            &#39;%&#39; = (length(ride_id) / nrow(tripdata_cleaned))*100,
+            &#39;members_p&#39; = (sum(member_casual == &#39;member&#39;) /length(ride_id))*100,
+            &#39;casual_p&#39; = (sum(member_casual == &#39;casual&#39;) /length(ride_id))*100,
+            &#39;member_casual_%_diff&#39; = members_p - casual_p )</code></pre>
+<pre><code>## # A tibble: 13 × 6
+##    year_month       count      `%` members_p casual_p `member_casual_%_diff`
+##    &lt;chr&gt;            &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;                  &lt;dbl&gt;
+##  1 2020 - 12 (Dec)    170  0.00304      51.8     48.2                   3.53
+##  2 2021 - 01 (Jan)  96564  1.73         81.3     18.7                  62.7 
+##  3 2021 - 02 (Feb)  49432  0.884        79.6     20.4                  59.2 
+##  4 2021 - 03 (Mar) 228347  4.09         63.2     36.8                  26.5 
+##  5 2021 - 04 (Apr) 337509  6.04         59.5     40.5                  19.0 
+##  6 2021 - 05 (May) 530759  9.50         51.7     48.3                   3.39
+##  7 2021 - 06 (Jun) 729093 13.0          49.2     50.8                  -1.58
+##  8 2021 - 07 (Jul) 823734 14.7          46.2     53.8                  -7.54
+##  9 2021 - 08 (Aug) 801207 14.3          48.8     51.2                  -2.44
+## 10 2021 - 09 (Sep) 755685 13.5          51.9     48.1                   3.79
+## 11 2021 - 10 (Oct) 630388 11.3          59.3     40.7                  18.6 
+## 12 2021 - 11 (Nov) 359576  6.43         70.3     29.7                  40.7 
+## 13 2021 - 12 (Dec) 247176  4.42         71.9     28.1                  43.7</code></pre>
+<pre class="r"><code>#Graph2 Distribution by months
+tripdata_cleaned %&gt;% 
+  ggplot(aes(year_month, fill=member_casual))+
+  geom_bar()+
+  labs(x=&quot;Month&quot;, title=&quot;2 Casual vs Members&quot;, subtitle = &quot; Distribution by Months&quot;)+
+  scale_y_continuous(labels = comma)+
+  coord_flip()</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-1-2.png" width="672" /></p>
+<pre class="r"><code>#Data distribution in the weekdays 
+tripdata_cleaned %&gt;% 
+  group_by(weekday) %&gt;% 
+  summarise(count=length(ride_id),
+            &#39;%&#39; = (length(ride_id) / nrow(tripdata_cleaned))*100,
+            &#39;members_p&#39; = (sum(member_casual == &#39;member&#39;) /length(ride_id))*100,
+            &#39;casual_p&#39; = (sum(member_casual == &#39;casual&#39;) /length(ride_id))*100,
+            &#39;member_casual_%_diff&#39; = members_p - casual_p )</code></pre>
+<pre><code>## # A tibble: 7 × 6
+##   weekday   count   `%` members_p casual_p `member_casual_%_diff`
+##   &lt;chr&gt;     &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;                  &lt;dbl&gt;
+## 1 1 - Mon  695757  12.4      59.6     40.4                  19.2 
+## 2 2 - Tue  740426  13.2      63.0     37.0                  25.9 
+## 3 3 - Wed  757794  13.6      63.1     36.9                  26.1 
+## 4 4 - Thu  745252  13.3      61.0     39.0                  21.9 
+## 5 5 - Fri  847091  15.2      54.2     45.8                   8.36
+## 6 6 - Sat 1000358  17.9      43.4     56.6                 -13.1 
+## 7 7 - Sun  802962  14.4      44.6     55.4                 -10.8</code></pre>
+<pre class="r"><code>#Graph3 Distribution by weekdays
+tripdata_cleaned %&gt;% 
+  ggplot(aes(weekday, fill=member_casual))+
+  geom_bar()+
+  labs(x=&quot;Weekdays&quot;, title=&quot;3 Casual vs Members&quot;, subtitle = &quot; Distribution by Weekdays&quot;)+
+  coord_flip()</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
+<pre class="r"><code>#Data Distribution by hour in day
+tripdata_cleaned %&gt;%
+  group_by(start_hour) %&gt;% 
+  summarise(count = length(ride_id),
+            &#39;%&#39; = (length(ride_id) / nrow(tripdata_cleaned)) * 100,
+            &#39;members_p&#39; = (sum(member_casual == &quot;member&quot;) / length(ride_id)) * 100,
+            &#39;casual_p&#39; = (sum(member_casual == &quot;casual&quot;) / length(ride_id)) * 100,
+            &#39;member_casual_%_difer&#39; = members_p - casual_p)</code></pre>
+<pre><code>## # A tibble: 24 × 6
+##    start_hour  count   `%` members_p casual_p `member_casual_%_difer`
+##    &lt;chr&gt;       &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;                   &lt;dbl&gt;
+##  1 00          23067 0.413      49.2     50.8                   -1.69
+##  2 01          45952 0.822      72.3     27.7                   44.6 
+##  3 02         107767 1.93       77.2     22.8                   54.5 
+##  4 03         186092 3.33       77.4     22.6                   54.8 
+##  5 04         225470 4.03       74.1     25.9                   48.3 
+##  6 05         201349 3.60       66.5     33.5                   33.1 
+##  7 06         220992 3.95       59.0     41.0                   17.9 
+##  8 07         275432 4.93       55.7     44.3                   11.5 
+##  9 08         330887 5.92       54.1     45.9                    8.18
+## 10 09         345502 6.18       51.5     48.5                    3.00
+## # … with 14 more rows</code></pre>
+<pre class="r"><code>#Graph4 Distribution of  by hours
+tripdata_cleaned %&gt;% 
+  ggplot(aes(start_hour, fill=member_casual)) +
+  labs(x=&quot;Hour of the day&quot;, title=&quot;4 Casual vs Members&quot;, subtitle = &quot;Distribution by hour&quot;) +
+  scale_y_continuous(labels = comma) +
+  geom_bar()</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-1-4.png" width="672" /></p>
+<pre class="r"><code>#Graph 5 Using FACET WRAP we divide each day by their respective hours
+tripdata_cleaned %&gt;% 
+  ggplot(aes(start_hour, fill=member_casual)) +
+  labs(x=&quot;Hour of the day&quot;, title=&quot;5 Casual vs Members&quot;, subtitle = &quot;Distribution by hour on separate days&quot;) +
+  scale_y_continuous(labels = comma) +
+  geom_bar()+
+  facet_wrap(~weekday)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-1-5.png" width="672" /></p>
+<pre class="r"><code>#Graph 6 for Weekend vs Weekdays
+tripdata_cleaned %&gt;%
+  mutate(type_of_weekday = ifelse(weekday == &#39;6 - Sat&#39; | weekday == &#39;7 - Sun&#39;,
+                                  &#39;weekend&#39;,
+                                  &#39;weekday&#39;)) %&gt;%
+  ggplot(aes(start_hour, fill=member_casual)) +
+  labs(x=&quot;Hour of the day&quot;, title=&quot;6 Casual VS Members&quot;, subtitle = &quot; Distribution by hour of the day in the weekday&quot;) +
+  scale_y_continuous(labels = comma) +
+  geom_bar() +
+  facet_wrap(~ type_of_weekday)</code></pre>
+<img src="index_files/figure-html/unnamed-chunk-1-6.png" width="672" />
+<br/> <br/> <b>
+<H4>
+Findings:
+</H4>
+</b>
+<ul>
+<li>
+Members are more than casual riders, approximately 10%.
+</li>
+<li>
+Riders are more on weekends.
+</li>
+<li>
+On weekend, casual riders are more with compare to members.
+</li>
+<li>
+Weather has more impact on number of riders, In Chicago, summer is from
+June to September, so more riders are there. On contrast, in winters,
+riders are low.
+</li>
+<li>
+Around 56% of data is coming from Summer.
+</li>
+<li>
+In all months members are more than casual riders.
+</li>
+</ul>
+<p><br/> <br/></p>
+<b>
+<H4>
+Conclusion:
+</H4>
+</b>
+<ol>
+<li>
+From Graph 1, We can conclude that members are comparatively more than
+casual riders.
+</li>
+<li>
+From Graph 2, which is distribution of riders by months, it is showing
+that in summer from June to September people love to ride more on
+cycles, specially casual riders are more in that period.
+</li>
+<li>
+From Graph 3, We can conclude that, on weekends people ride cycle more
+with compare to weekdays.
+</li>
+<li>
+From Graph 4, we can say that from midnight to afternoon riders are
+increasing after that riders are gradually decreasing till midnight.
+</li>
+<li>
+From Graph 5, we can conclude that during weekdays graph is steep wise
+in increasing from midnight till morning than it become constant before
+reaching on peak at noon, then riders are gradually decreasing smoothly.
+On the other hand, on Saturday and Sunday Graph is increasing smoothly
+from midnight to noon and then decreasing smoothly. Additionally, Casual
+members are low on weekdays with compare to weekends.
+</li>
+</ol>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+---
+title: "About"
+author: "sadikpalsania"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+<p>This data is analysed by Mohammadsadik Palsania.</p>
+
+<p>I am Mohammadsadik Palsania, who is pursuing Master's degree of Computer Science in Canada. I am looking for an entry level job. If you find any related information you can contact me on sadikpalsania@gmail.com </p>
+<p>I enjoy processing and analyzing data - starting from an early stage database and converting it into simple comprehensible formats that help improve business decisions. Ardent about solving problems, interpreting data and analyzing them using statistical techniques. A good listener known for taking initiatives, team player and fast learner. Comfortable with Python, R, Power BI, Tableau and Excel.</p>

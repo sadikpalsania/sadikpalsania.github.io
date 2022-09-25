@@ -1,0 +1,213 @@
+---
+title: "US Cyclist Data 2021 Analysis"
+author: "sadikpalsania"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+<p><h4>Scenario</h4>
+
+You are a junior data analyst working in the marketing analyst team at Cyclistic, a bike-share company in Chicago. The director of marketing believes the company’s future success depends on maximizing the number of annual memberships. Therefore, your team wants to understand how casual riders and annual members use Cyclistic bikes dierently. From these insights, your team will design a new marketing strategy to convert casual riders into annual members. But first, Cyclistic executives must approve your recommendations, so they must be backed up with compelling data insights and professional data visualizations.
+
+Characters and teams
+Cyclistic: A bike-share program that features more than 5,800 bicycles and 600 docking stations. Cyclistic sets itself apart by also oering reclining bikes, hand tricycles, and cargo bikes, making bike-share more inclusive to people with disabilities and riders who can’t use a standard two-wheeled bike. The majority of riders opt for traditional bikes; about 8% of riders use the assistive options. Cyclistic users are more likely to ride for leisure, but about 30% use them to commute to work each day.
+Lily Moreno: The director of marketing and your manager. Moreno is responsible for the development of campaigns and initiatives to promote the bike-share program. These may include email, social media, and other channels.
+Cyclistic marketing analytics team: A team of data analysts who are responsible for collecting, analyzing, and reporting data that helps guide Cyclistic marketing strategy. You joined this team six months ago and have been busy learning about Cyclistic’s mission and business goals — as well as how you, as a junior data analyst, can help Cyclistic achieve them.
+Cyclistic executive team: The notoriously detail-oriented executive team will decide whether to approve the recommended marketing program.</p>
+
+```{r}
+#loading libraries
+library(plyr)
+library(tidyverse)
+library(lubridate)
+library(DescTools)
+library(scales)
+
+#loading data set
+csv_files <- list.files(path = "C:/Users/sadik/Downloads/CaseStudyPython", recursive = TRUE, full.names=TRUE)
+
+#merging data set
+tripdata_merged <- do.call(rbind, lapply(csv_files, read.csv))
+
+#view of data
+head(tripdata_merged)
+
+#--------------------Preparing and Processing-------------------------
+
+#checking Null values and drop if there
+colSums(is.na(tripdata_merged))
+
+#No Null values find in my dataset
+tripdata_cleaned <- tripdata_merged[complete.cases(tripdata_merged), ]
+
+# removing data where ending time is greater than starting time.
+tripdata_cleaned <- tripdata_cleaned %>% 
+  filter(tripdata_cleaned$started_at < tripdata_cleaned$ended_at)
+
+#Changing datatype of datetime
+tripdata_cleaned$started_at <- as.POSIXct(tripdata_cleaned$started_at, "%Y-%m-%d %H:%M:%S")
+tripdata_cleaned$ended_at <- as.POSIXct(tripdata_cleaned$ended_at, "%Y-%m-%d %H:%M:%S")
+
+#Creating a column for month and year separately for calculation
+tripdata_cleaned <- tripdata_cleaned %>%
+  mutate(year_month = paste(strftime(tripdata_cleaned$started_at, "%Y"),
+                            "-",
+                            strftime(tripdata_cleaned$started_at, "%m"),
+                            paste("(",strftime(tripdata_cleaned$started_at, "%b"), ")", sep="")))
+unique(tripdata_cleaned$year_month)
+
+#Creating column weekday for calculation
+tripdata_cleaned <- tripdata_cleaned %>%
+  mutate(weekday = paste(strftime(tripdata_cleaned$started_at, "%u"), 
+                         "-", 
+                         strftime(tripdata_cleaned$started_at, "%a")))
+unique(tripdata_cleaned$weekday)
+
+#Creating column for starting hour for calculation
+tripdata_cleaned <- tripdata_cleaned %>%
+  mutate(start_hour = strftime(tripdata_cleaned$ended_at, "%H"))
+unique(tripdata_cleaned$start_hour)
+
+# calculate and creating column ride length
+tripdata_cleaned$ride_length <- tripdata_cleaned$ended_at - tripdata_cleaned$started_at
+
+# calculate mean of ride_length
+tripdata_cleaned %>% 
+  summarize(mean(ride_length))
+
+# calculate max ride_length
+tripdata_cleaned %>% 
+  summarize(max(ride_length))
+
+# calculate min ride_length
+tripdata_cleaned %>% 
+  summarize(min(ride_length))
+
+# calculate mode of day_of_week
+Mode(tripdata_cleaned$weekday)
+
+# calculate average ride_length for members and casual riders
+tripdata_cleaned %>% 
+  group_by(member_casual) %>% 
+  summarise(summary=mean(ride_length))
+
+#calculate average ride_length by days of week
+tripdata_cleaned %>% 
+  group_by(weekday) %>% 
+  summarise(summary_day=mean(ride_length))
+
+#calculate No. of rides by user per day of week
+tripdata_cleaned %>% 
+  group_by(ride_id, weekday) %>% 
+  summarise(no_of_ride=n())
+
+
+#-----------------------------------------------Analyzing and Visualizing-----------------------
+
+fig <- function(width, heigth){options(repr.plot.width = width, repr.plot.height = heigth)}
+
+#Generalize form of Casual VS Member riders
+tripdata_cleaned %>% 
+  group_by(member_casual) %>% 
+  summarise(count = length(ride_id),
+            '%' = (length(ride_id) / nrow(tripdata_cleaned)) * 100)
+
+#Graph 1 General distribution
+fig(16,8)
+ggplot(tripdata_cleaned, aes(member_casual, fill=member_casual)) +
+  geom_bar() +
+  labs(x="Casuals x Members", title="1 Casuals VS Members", subtitle = "Generalized form")+
+  scale_y_continuous(labels = comma)
+
+#Data distribution in the months 
+tripdata_cleaned %>% 
+  group_by(year_month) %>% 
+  summarise(count=length(ride_id),
+            '%' = (length(ride_id) / nrow(tripdata_cleaned))*100,
+            'members_p' = (sum(member_casual == 'member') /length(ride_id))*100,
+            'casual_p' = (sum(member_casual == 'casual') /length(ride_id))*100,
+            'member_casual_%_diff' = members_p - casual_p )
+
+#Graph2 Distribution by months
+tripdata_cleaned %>% 
+  ggplot(aes(year_month, fill=member_casual))+
+  geom_bar()+
+  labs(x="Month", title="2 Casual vs Members", subtitle = " Distribution by Months")+
+  scale_y_continuous(labels = comma)+
+  coord_flip()
+
+#Data distribution in the weekdays 
+tripdata_cleaned %>% 
+  group_by(weekday) %>% 
+  summarise(count=length(ride_id),
+            '%' = (length(ride_id) / nrow(tripdata_cleaned))*100,
+            'members_p' = (sum(member_casual == 'member') /length(ride_id))*100,
+            'casual_p' = (sum(member_casual == 'casual') /length(ride_id))*100,
+            'member_casual_%_diff' = members_p - casual_p )
+
+#Graph3 Distribution by weekdays
+tripdata_cleaned %>% 
+  ggplot(aes(weekday, fill=member_casual))+
+  geom_bar()+
+  labs(x="Weekdays", title="3 Casual vs Members", subtitle = " Distribution by Weekdays")+
+  coord_flip()
+
+#Data Distribution by hour in day
+tripdata_cleaned %>%
+  group_by(start_hour) %>% 
+  summarise(count = length(ride_id),
+            '%' = (length(ride_id) / nrow(tripdata_cleaned)) * 100,
+            'members_p' = (sum(member_casual == "member") / length(ride_id)) * 100,
+            'casual_p' = (sum(member_casual == "casual") / length(ride_id)) * 100,
+            'member_casual_%_difer' = members_p - casual_p)
+
+#Graph4 Distribution of  by hours
+tripdata_cleaned %>% 
+  ggplot(aes(start_hour, fill=member_casual)) +
+  labs(x="Hour of the day", title="4 Casual vs Members", subtitle = "Distribution by hour") +
+  scale_y_continuous(labels = comma) +
+  geom_bar()
+
+#Graph 5 Using FACET WRAP we divide each day by their respective hours
+tripdata_cleaned %>% 
+  ggplot(aes(start_hour, fill=member_casual)) +
+  labs(x="Hour of the day", title="5 Casual vs Members", subtitle = "Distribution by hour on separate days") +
+  scale_y_continuous(labels = comma) +
+  geom_bar()+
+  facet_wrap(~weekday)
+
+#Graph 6 for Weekend vs Weekdays
+tripdata_cleaned %>%
+  mutate(type_of_weekday = ifelse(weekday == '6 - Sat' | weekday == '7 - Sun',
+                                  'weekend',
+                                  'weekday')) %>%
+  ggplot(aes(start_hour, fill=member_casual)) +
+  labs(x="Hour of the day", title="6 Casual VS Members", subtitle = " Distribution by hour of the day in the weekday") +
+  scale_y_continuous(labels = comma) +
+  geom_bar() +
+  facet_wrap(~ type_of_weekday)
+```
+<br/>
+<br/>
+<b><H4>Findings:</H4></b>
+<ul>
+<li>Members are more than casual riders, approximately 10%.</li>
+<li>Riders are more on weekends.</li>
+<li>On weekend, casual riders are more with compare to members.</li>
+<li>Weather has more impact on number of riders, In Chicago, summer is from June to September, so more riders are there. On contrast, in winters, riders are low.</li>
+<li>Around 56% of data is coming from Summer.</li>
+<li>In all months members are more than casual riders.</li>
+</ul>
+
+
+<br/>
+<br/>
+
+<b><H4>Conclusion:</H4></b>
+<ol>
+<li>From Graph 1, We can conclude that members are comparatively more than casual riders.</li>
+<li>From Graph 2, which is distribution of riders by months, it is showing that in summer from June to September people love to ride more on cycles, specially casual riders are more in that period.</li>
+<li>From Graph 3, We can conclude that, on weekends people ride cycle more with compare to weekdays.</li>
+<li>From Graph 4, we can say that from midnight to afternoon riders are increasing after that riders are gradually decreasing till midnight.</li>
+<li>From Graph 5, we can conclude that during weekdays graph is steep wise in increasing from midnight till morning than it become constant before reaching on peak at noon, then riders are gradually decreasing smoothly. On the other hand, on Saturday and Sunday Graph is increasing smoothly from midnight to noon and then decreasing smoothly. Additionally, Casual members are low on weekdays with compare to weekends.</li>
+</ol>
